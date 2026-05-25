@@ -79,16 +79,41 @@ router.get("/", async (req, res) => {
 router.get("/stats", async (req, res) => {
   try {
     const db = getDB();
+    const count = async (sql, params = []) => {
+      const r = await db.exec(sql, params);
+      return r[0]?.values[0][0] || 0;
+    };
     const cats = ["corruption", "crime", "broken-promise", "admin-failure", "honour-killing", "loss-investments", "insta-cards"];
     const stats = {};
     for (const c of cats) {
-      const r = await db.exec("SELECT COUNT(*) FROM incidents WHERE category=? AND is_published=1", [c]);
-      stats[c] = r[0]?.values[0][0] || 0;
+      stats[c] = await count("SELECT COUNT(*) FROM incidents WHERE category=? AND is_published=1", [c]);
     }
-    const total = await db.exec("SELECT COUNT(*) FROM incidents WHERE is_published=1");
-    stats.total = total[0]?.values[0][0] || 0;
-    const critical = await db.exec("SELECT COUNT(*) FROM incidents WHERE severity='critical' AND is_published=1");
-    stats.critical = critical[0]?.values[0][0] || 0;
+    stats.total = await count("SELECT COUNT(*) FROM incidents WHERE is_published=1");
+    for (const sev of ["critical", "high", "medium", "low"]) {
+      stats[sev] = await count("SELECT COUNT(*) FROM incidents WHERE severity=? AND is_published=1", [sev]);
+    }
+    stats.districts = await count("SELECT COUNT(DISTINCT district) FROM incidents WHERE is_published=1");
+    for (const st of ["unresolved", "under-investigation", "fir-filed", "partially-resolved", "nhrc-notice", "resolved"]) {
+      const key = st.replace(/-/g, "_");
+      stats[key] = await count("SELECT COUNT(*) FROM incidents WHERE status=? AND is_published=1", [st]);
+    }
+    stats.open_cases = stats.unresolved + stats.under_investigation + stats.fir_filed;
+    stats.categories_active = cats.filter(c => stats[c] > 0).length;
+    stats.evidence_files = await count(
+      "SELECT COUNT(*) FROM files f INNER JOIN incidents i ON f.incident_id=i.id WHERE i.is_published=1"
+    );
+    const topDistrictRows = await db.exec(
+      "SELECT district, COUNT(*) AS c FROM incidents WHERE is_published=1 GROUP BY district ORDER BY c DESC LIMIT 1"
+    );
+    if (topDistrictRows[0]?.values?.length) {
+      const cols = topDistrictRows[0].columns;
+      const row = topDistrictRows[0].values[0];
+      stats.top_district = row[cols.indexOf("district")] || "";
+      stats.top_district_count = row[cols.indexOf("c")] || 0;
+    } else {
+      stats.top_district = "";
+      stats.top_district_count = 0;
+    }
     res.json(stats);
   } catch (err) {
     console.error("Stats error:", err);

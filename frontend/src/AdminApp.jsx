@@ -341,9 +341,12 @@ html.lang-ta .pol-hero h1 em{font-weight:700}
 .pol-dash-cell{
   background:linear-gradient(180deg,var(--bg2),var(--bg3));
   padding:18px 16px;display:flex;flex-direction:column;gap:6px;
-  transition:background 0.2s
+  transition:background 0.2s,border-color 0.2s,box-shadow 0.2s
 }
 .pol-dash-cell:hover{background:var(--bg4)}
+.pol-dash-cell.is-link{cursor:pointer}
+.pol-dash-cell.is-link:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.pol-dash-cell.is-active{background:var(--bg4);box-shadow:inset 0 0 0 1px var(--accent)}
 .pol-dash-num{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1}
 .pol-dash-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
 .pol-dash-icon{font-size:18px;opacity:0.85}
@@ -373,6 +376,14 @@ html.lang-ta .pol-hero h1 em{font-weight:700}
 .pol-cat-fill{height:100%;border-radius:2px;transition:width 0.4s}
 .pol-cat-name{font-size:12px;font-weight:600;color:var(--text2);min-width:90px}
 .pol-cat-count{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:24px;text-align:right}
+.pol-facts-divider{height:1px;background:var(--border);margin:14px 0 12px}
+.pol-facts-head{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:8px}
+.pol-facts-subhead{font-family:var(--mono);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text4);margin:10px 0 6px}
+.pol-facts-subhead:first-of-type{margin-top:0}
+.pol-fact-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--row-border)}
+.pol-fact-row:last-child{border-bottom:none;padding-bottom:0}
+.pol-fact-lbl{font-size:12px;color:var(--text2);line-height:1.45}
+.pol-fact-val{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;text-align:right;max-width:52%}
 .pol-feed-head{
   display:flex;align-items:center;justify-content:space-between;
   gap:12px;margin-bottom:20px;flex-wrap:wrap
@@ -547,7 +558,7 @@ const TRANSLATIONS = {
     livePublicTracker: "Live Public Tracker",
     heroTitle: "Tracking TVK", heroAccent: "Corruption & Crimes",
     heroSub: "Public-interest documentation of corruption, crime, broken promises, honour killings, investment fraud, Instagram scams, and administrative failures.",
-    statTotalFiles: "Total Files", statCorruption: "Corruption", statCrime: "Crime", statBrokenPromises: "Broken Promises", statCritical: "Critical",
+    statTotalFiles: "Total Files", statCorruption: "Corruption", statCrime: "Crime", statBrokenPromises: "Broken Promises", statCritical: "Critical", statFacts: "Facts",
     searchIncidents: "Search incidents…", showingOf: "Showing", of: "of", incidents: "incidents",
     loadingIncidents: "Loading incidents…", noIncidentsMatch: "No incidents match your filters.",
     district: "District", date: "Date", severity: "Severity", status: "Status", source: "Source",
@@ -576,6 +587,15 @@ const TRANSLATIONS = {
     themeLight: "Light", themeDark: "Dark",
     latestReports: "Latest Reports", featuredReport: "Featured Investigation",
     accountabilityIndex: "Accountability Index", readReport: "Read full report",
+    facts: "Facts", factTotalRecords: "Total public records", factCriticalCases: "Critical cases",
+    factHighSeverity: "High severity", factMediumSeverity: "Medium severity", factLowSeverity: "Low severity",
+    factDistrictsCovered: "Districts covered", factTopDistrict: "Most reported district",
+    factTopCategory: "Most reported category", factCategoriesActive: "Active categories",
+    factUnresolved: "Unresolved cases", factUnderInvestigation: "Under investigation",
+    factFirFiled: "FIR filed", factPartiallyResolved: "Partially resolved", factResolved: "Resolved cases",
+    factNhrcNotice: "NHRC notices", factOpenCases: "Open cases", factCriticalRate: "Critical rate",
+    factEvidenceFiles: "Evidence files", factGroupOverview: "Overview", factGroupSeverity: "Severity",
+    factGroupStatus: "Case status", factGroupCoverage: "Coverage",
     investigationDossier: "Investigation Dossier", allCategories: "All categories",
     district_Chennai: "Chennai", district_Coimbatore: "Coimbatore", district_Madurai: "Madurai",
     district_Tiruchirappalli: "Tiruchirappalli", district_Salem: "Salem", district_Vellore: "Vellore",
@@ -590,7 +610,7 @@ const TRANSLATIONS = {
     livePublicTracker: "நேரடி பொதுப் பதிவு",
     heroTitle: "தவெக", heroAccent: "ஊழல் & குற்றங்களை கண்காணித்தல்",
     heroSub: "ஊழல், குற்றம், முறிந்த வாக்குறுதிகள், கொள்கைக் கொலை, முதலீட்டு மோசடி, இன்ஸ்டா கார்ட் மோசடி மற்றும் நிர்வாக தோல்விகளின் பொதுநல ஆவணப்படுத்தல்.",
-    statTotalFiles: "மொத்த கோப்புகள்", statCorruption: "ஊழல்", statCrime: "குற்றம்", statBrokenPromises: "முறிந்த வாக்குறுதிகள்", statCritical: "முக்கிய",
+    statTotalFiles: "மொத்த கோப்புகள்", statCorruption: "ஊழல்", statCrime: "குற்றம்", statBrokenPromises: "முறிந்த வாக்குறுதிகள்", statCritical: "முக்கிய", statFacts: "உண்மைகள்",
     searchIncidents: "சம்பவங்களை தேடு…", showingOf: "காட்டப்படுவது", of: "இல்", incidents: "சம்பவங்கள்",
     loadingIncidents: "சம்பவங்கள் ஏற்றப்படுகின்றன…", noIncidentsMatch: "உங்கள் வடிகட்டிகளுக்கு பொருந்தும் சம்பவங்கள் இல்லை.",
     district: "மாவட்டம்", date: "தேதி", severity: "தீவிரம்", status: "நிலை", source: "ஆதாரம்",
@@ -619,6 +639,15 @@ const TRANSLATIONS = {
     themeLight: "ஒளி", themeDark: "இருள்",
     latestReports: "சமீபத்திய அறிக்கைகள்", featuredReport: "முக்கிய விசாரணை",
     accountabilityIndex: "பொறுப்புக்கான குறியீடு", readReport: "முழு அறிக்கை பார்",
+    facts: "உண்மைகள்", factTotalRecords: "மொத்த பொது பதிவுகள்", factCriticalCases: "முக்கிய வழக்குகள்",
+    factHighSeverity: "உயர் தீவிரம்", factMediumSeverity: "நடுத்தர தீவிரம்", factLowSeverity: "குறைந்த தீவிரம்",
+    factDistrictsCovered: "உள்ளடக்கிய மாவட்டங்கள்", factTopDistrict: "அதிகம் பதிவான மாவட்டம்",
+    factTopCategory: "அதிகம் பதிவான வகை", factCategoriesActive: "செயலில் உள்ள வகைகள்",
+    factUnresolved: "தீர்க்கப்படாத வழக்குகள்", factUnderInvestigation: "விசாரணையில்",
+    factFirFiled: "FIR பதிவு", factPartiallyResolved: "பகுதியாக தீர்க்கப்பட்டது", factResolved: "தீர்க்கப்பட்ட வழக்குகள்",
+    factNhrcNotice: "NHRC அறிவிப்புகள்", factOpenCases: "திறந்த வழக்குகள்", factCriticalRate: "முக்கிய விகிதம்",
+    factEvidenceFiles: "ஆதார கோப்புகள்", factGroupOverview: "சுருக்கம்", factGroupSeverity: "தீவிரம்",
+    factGroupStatus: "வழக்கு நிலை", factGroupCoverage: "பரப்பளவு",
     investigationDossier: "விசாரணை ஆவணம்", allCategories: "அனைத்து வகைகள்",
     district_Chennai: "சென்னை", district_Coimbatore: "கோயம்புத்தூர்", district_Madurai: "மதுரை",
     district_Tiruchirappalli: "திருச்சி", district_Salem: "சேலம்", district_Vellore: "வேலூர்",
@@ -1928,6 +1957,14 @@ function PublicTrackerView({ toast, embedded }) {
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [factsActive, setFactsActive] = useState(false);
+  const factsRef = useRef(null);
+
+  const scrollToFacts = useCallback(() => {
+    factsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    setFactsActive(true);
+    window.setTimeout(() => setFactsActive(false), 1600);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -1953,14 +1990,60 @@ function PublicTrackerView({ toast, embedded }) {
   }, [selectedId]);
 
   const statCards = [
-    ["📂", stats.total, t("statTotalFiles"), "var(--text)"],
-    ["💰", stats.corruption, t("statCorruption"), "#ef4444"],
-    ["🚨", stats.crime, t("statCrime"), "#f97316"],
-    ["📜", stats["broken-promise"], t("statBrokenPromises"), "#a855f7"],
-    ["⚡", stats.critical, t("statCritical"), "#ef4444"],
+    { icon: "📂", num: stats.total, lbl: t("statTotalFiles"), color: "var(--text)" },
+    { icon: "💰", num: stats.corruption, lbl: t("statCorruption"), color: "#ef4444" },
+    { icon: "🚨", num: stats.crime, lbl: t("statCrime"), color: "#f97316" },
+    { icon: "📜", num: stats["broken-promise"], lbl: t("statBrokenPromises"), color: "#a855f7" },
+    { icon: "⚡", num: stats.critical, lbl: t("statCritical"), color: "#ef4444" },
+    { icon: "📋", num: stats.open_cases, lbl: t("statFacts"), color: "var(--blue)", onClick: scrollToFacts, link: true },
   ];
   const catStats = categories.filter(c => c.id !== "all").map(c => ({ ...c, count: stats[c.id] || 0 }));
   const maxCat = Math.max(...catStats.map(c => c.count), 1);
+  const topCategory = catStats.reduce((best, c) => (c.count > (best?.count ?? -1) ? c : best), null);
+  const topDistrictLabel = stats.top_district ? districtLabel(stats.top_district) : "—";
+  const topDistrictValue = stats.top_district_count > 0 ? `${topDistrictLabel} (${stats.top_district_count})` : "—";
+  const criticalRate = stats.total > 0 ? `${Math.round((stats.critical / stats.total) * 100)}%` : "—";
+  const val = (n) => (n !== undefined && n !== null ? n : "…");
+  const factGroups = [
+    {
+      title: t("factGroupOverview"),
+      items: [
+        { label: t("factTotalRecords"), value: val(stats.total) },
+        { label: t("factEvidenceFiles"), value: val(stats.evidence_files) },
+        { label: t("factCategoriesActive"), value: val(stats.categories_active) },
+        { label: t("factOpenCases"), value: val(stats.open_cases) },
+      ],
+    },
+    {
+      title: t("factGroupCoverage"),
+      items: [
+        { label: t("factDistrictsCovered"), value: val(stats.districts) },
+        { label: t("factTopDistrict"), value: topDistrictValue },
+        { label: t("factTopCategory"), value: topCategory?.count > 0 ? `${topCategory.label} (${topCategory.count})` : "—" },
+      ],
+    },
+    {
+      title: t("factGroupSeverity"),
+      items: [
+        { label: t("factCriticalCases"), value: val(stats.critical), color: SEVERITY_COLORS.critical },
+        { label: t("factHighSeverity"), value: val(stats.high), color: SEVERITY_COLORS.high },
+        { label: t("factMediumSeverity"), value: val(stats.medium), color: SEVERITY_COLORS.medium },
+        { label: t("factLowSeverity"), value: val(stats.low), color: SEVERITY_COLORS.low },
+        { label: t("factCriticalRate"), value: criticalRate },
+      ],
+    },
+    {
+      title: t("factGroupStatus"),
+      items: [
+        { label: t("factUnderInvestigation"), value: val(stats.under_investigation) },
+        { label: t("factUnresolved"), value: val(stats.unresolved) },
+        { label: t("factFirFiled"), value: val(stats.fir_filed) },
+        { label: t("factPartiallyResolved"), value: val(stats.partially_resolved) },
+        { label: t("factNhrcNotice"), value: val(stats.nhrc_notice) },
+        { label: t("factResolved"), value: val(stats.resolved) },
+      ],
+    },
+  ];
   const featured = incidents.length > 0
     ? [...incidents].sort((a, b) => SEVERITY_KEYS.indexOf(a.severity) - SEVERITY_KEYS.indexOf(b.severity))[0]
     : null;
@@ -2045,8 +2128,15 @@ function PublicTrackerView({ toast, embedded }) {
           <h1>{t("heroTitle")} <em>{t("heroAccent")}</em></h1>
           <p className="pol-hero-lead">{t("heroSub")}</p>
           <div className="pol-dash">
-            {statCards.map(([icon, num, lbl, color]) => (
-              <div className="pol-dash-cell" key={lbl}>
+            {statCards.map(({ icon, num, lbl, color, onClick, link }) => (
+              <div
+                className={`pol-dash-cell${link ? " is-link" : ""}${factsActive && link ? " is-active" : ""}`}
+                key={lbl}
+                onClick={onClick}
+                onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
+                role={onClick ? "button" : undefined}
+                tabIndex={onClick ? 0 : undefined}
+              >
                 <div className="pol-dash-icon">{icon}</div>
                 <div className="pol-dash-num" style={{ color }}>{num ?? "…"}</div>
                 <div className="pol-dash-lbl">{lbl}</div>
@@ -2067,6 +2157,19 @@ function PublicTrackerView({ toast, embedded }) {
                   <div className="pol-cat-bar"><div className="pol-cat-fill" style={{ width: `${(c.count / maxCat) * 100}%`, background: c.color }} /></div>
                   <span className="pol-cat-count">{c.count}</span>
         </div>
+              ))}
+              <div className="pol-facts-divider" ref={factsRef} id="accountability-facts" />
+              <div className="pol-facts-head">{t("facts")}</div>
+              {factGroups.map(group => (
+                <div key={group.title}>
+                  <div className="pol-facts-subhead">{group.title}</div>
+                  {group.items.map(item => (
+                    <div key={item.label} className="pol-fact-row">
+                      <span className="pol-fact-lbl">{item.label}</span>
+                      <span className="pol-fact-val" style={item.color ? { color: item.color } : undefined}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
