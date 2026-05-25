@@ -1,0 +1,7 @@
+node_modules/
+.env
+db/tvkfiles.sqlite
+uploads/
+dist/
+.DS_Store
+*.log
