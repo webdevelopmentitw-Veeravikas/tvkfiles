@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext, useMemo } from "react";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-const API = "http://localhost:4000/api";
-const API_ORIGIN = API.replace(/\/api$/, "");
+const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
+const API_ORIGIN = API.replace(/\/api$/, "") || "";
 
 // ─── STYLES ──────────────────────────────────────────────────────────────────
 const styles = `
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
+:root,html.theme-dark{
   --bg:#080a0f;--bg2:#0f1219;--bg3:#161b26;--bg4:#1e2433;
   --border:#252b3a;--border2:#323a4d;--border3:#3f4860;
   --text:#eef0f6;--text2:#9aa3b5;--text3:#636d82;--text4:#454e62;
@@ -22,6 +22,29 @@ const styles = `
   --radius:10px;
   --shadow:0 4px 24px rgba(0,0,0,0.35);
   --shadow-lg:0 12px 40px rgba(0,0,0,0.45);
+  --overlay:rgba(0,0,0,0.8);
+  --masthead-bg:rgba(8,10,15,0.88);
+  --panel-head-bg:rgba(0,0,0,0.2);
+  --grid-line:rgba(255,255,255,0.02);
+  --row-border:rgba(255,255,255,0.04);
+  --card-foot-bg:rgba(0,0,0,0.15);
+  --featured-badge-bg:rgba(0,0,0,0.65);
+  --toast-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+html.theme-light{
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#eef1f7;--bg4:#e2e8f2;
+  --border:#d5dce8;--border2:#bcc6d6;--border3:#9aa8bc;
+  --text:#0c1018;--text2:#4a5568;--text3:#647089;--text4:#8892a4;
+  --shadow:0 4px 24px rgba(15,23,42,0.08);
+  --shadow-lg:0 12px 40px rgba(15,23,42,0.12);
+  --overlay:rgba(15,18,25,0.5);
+  --masthead-bg:rgba(255,255,255,0.92);
+  --panel-head-bg:rgba(15,23,42,0.04);
+  --grid-line:rgba(15,23,42,0.06);
+  --row-border:rgba(15,23,42,0.06);
+  --card-foot-bg:rgba(15,23,42,0.04);
+  --featured-badge-bg:rgba(15,23,42,0.72);
+  --toast-shadow:0 4px 20px rgba(15,23,42,0.12);
 }
 html.lang-ta body{font-family:var(--font-ta)}
 html.lang-en body{font-family:var(--font)}
@@ -188,7 +211,7 @@ tr:last-child td{border-bottom:none}
 .file-status{font-family:var(--mono);font-size:10px;font-weight:700}
 
 /* ── Modal ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(8px);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;position:relative}
 .modal-lg{max-width:820px}
 .modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--bg2);z-index:1}
@@ -200,7 +223,7 @@ tr:last-child td{border-bottom:none}
 
 /* ── Toast ── */
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--bg2);border:1px solid var(--border2);padding:10px 16px;border-radius:var(--radius);font-family:var(--mono);font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.4);animation:toastIn 0.25s ease;min-width:260px}
+.toast{background:var(--bg2);border:1px solid var(--border2);padding:10px 16px;border-radius:var(--radius);font-family:var(--mono);font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:var(--toast-shadow);animation:toastIn 0.25s ease;min-width:260px}
 .toast-success{border-color:rgba(34,197,94,0.4);color:var(--green)}
 .toast-error{border-color:rgba(239,68,68,0.4);color:var(--red)}
 .toast-info{border-color:rgba(59,130,246,0.4);color:var(--blue)}
@@ -258,12 +281,12 @@ tr:last-child td{border-bottom:none}
 .political-app{min-height:100vh;background:var(--bg);position:relative}
 .political-app::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
   background-size:48px 48px;mask-image:linear-gradient(to bottom,black 0%,transparent 85%)
 }
 .pol-masthead{
   position:sticky;top:0;z-index:200;
-  background:rgba(8,10,15,0.88);backdrop-filter:blur(16px) saturate(1.2);
+  background:var(--masthead-bg);backdrop-filter:blur(16px) saturate(1.2);
   border-bottom:1px solid var(--border)
 }
 .pol-masthead-accent{height:3px;background:linear-gradient(90deg,var(--accent),#f97316 35%,var(--purple) 70%,var(--blue))}
@@ -335,12 +358,12 @@ html.lang-ta .pol-hero h1 em{font-weight:700}
   padding:12px 16px;border-bottom:1px solid var(--border);
   font-family:var(--mono);font-size:9px;font-weight:700;
   text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);
-  background:rgba(0,0,0,0.2)
+  background:var(--panel-head-bg)
 }
 .pol-panel-body{padding:14px 16px}
 .pol-cat-row{
   display:flex;align-items:center;gap:10px;padding:8px 0;
-  border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;
+  border-bottom:1px solid var(--row-border);cursor:pointer;
   transition:opacity 0.15s
 }
 .pol-cat-row:last-child{border-bottom:none}
@@ -378,7 +401,7 @@ html.lang-ta .pol-hero h1 em{font-weight:700}
   position:absolute;top:16px;left:16px;z-index:2;
   font-family:var(--mono);font-size:9px;font-weight:700;
   text-transform:uppercase;letter-spacing:1px;
-  padding:5px 10px;border-radius:6px;background:rgba(0,0,0,0.65);
+  padding:5px 10px;border-radius:6px;background:var(--featured-badge-bg);
   color:var(--yellow);border:1px solid rgba(251,191,36,0.3)
 }
 .pol-featured-body{padding:28px 24px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
@@ -414,7 +437,7 @@ html.lang-ta .pol-card-title{letter-spacing:0;font-weight:600}
 .pol-card-foot{
   padding:10px 16px 12px 20px;border-top:1px solid var(--border);
   display:flex;justify-content:space-between;align-items:center;gap:8px;
-  background:rgba(0,0,0,0.15)
+  background:var(--card-foot-bg)
 }
 .pol-card-meta{font-family:var(--mono);font-size:10px;color:var(--text3)}
 .pol-card-status{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border)}
@@ -461,6 +484,8 @@ html.lang-en .lang-btn{font-family:var(--font);font-weight:600}
 html.lang-ta .lang-btn{font-family:var(--font-ta);font-weight:600}
 .lang-btn:hover{color:var(--text2)}
 .lang-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(244,63,94,0.35)}
+.theme-toggle .lang-btn{min-width:44px;padding:6px 12px}
+.topbar-toggles,.masthead-toggles{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pub-search-wrap{position:relative;flex:1;min-width:200px}
 .pub-search-wrap .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
 .pub-search-wrap input{padding-left:38px!important;background:var(--bg3)!important;border-radius:10px!important}
@@ -548,6 +573,7 @@ const TRANSLATIONS = {
     sev_critical: "Critical", sev_high: "High", sev_medium: "Medium", sev_low: "Low",
     siteTagline: "Public accountability tracker",     filterCategory: "Category", filterDistrict: "District",
     langEnglish: "English", langTamil: "Tamil",
+    themeLight: "Light", themeDark: "Dark",
     latestReports: "Latest Reports", featuredReport: "Featured Investigation",
     accountabilityIndex: "Accountability Index", readReport: "Read full report",
     investigationDossier: "Investigation Dossier", allCategories: "All categories",
@@ -590,6 +616,7 @@ const TRANSLATIONS = {
     sev_critical: "முக்கிய", sev_high: "உயர்", sev_medium: "நடுத்தர", sev_low: "குறைந்த",
     siteTagline: "பொது பொறுப்புக்கான பதிவு",     filterCategory: "வகை", filterDistrict: "மாவட்டம்",
     langEnglish: "English", langTamil: "தமிழ்",
+    themeLight: "ஒளி", themeDark: "இருள்",
     latestReports: "சமீபத்திய அறிக்கைகள்", featuredReport: "முக்கிய விசாரணை",
     accountabilityIndex: "பொறுப்புக்கான குறியீடு", readReport: "முழு அறிக்கை பார்",
     investigationDossier: "விசாரணை ஆவணம்", allCategories: "அனைத்து வகைகள்",
@@ -600,6 +627,43 @@ const TRANSLATIONS = {
 };
 
 const LanguageContext = createContext(null);
+const ThemeContext = createContext(null);
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("tvk_theme");
+    const initial = saved === "light" || saved === "dark"
+      ? saved
+      : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    document.documentElement.classList.remove("theme-light", "theme-dark");
+    document.documentElement.classList.add(`theme-${initial}`);
+    return initial;
+  });
+  useEffect(() => {
+    localStorage.setItem("tvk_theme", theme);
+    document.documentElement.classList.remove("theme-light", "theme-dark");
+    document.documentElement.classList.add(`theme-${theme}`);
+  }, [theme]);
+  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+function useTheme() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
+  return ctx;
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const { t } = useLanguage();
+  return (
+    <div className="lang-toggle theme-toggle" role="group" aria-label="Theme">
+      <button type="button" className={`lang-btn${theme === "light" ? " active" : ""}`} onClick={() => setTheme("light")} aria-pressed={theme === "light"}>☀ {t("themeLight")}</button>
+      <button type="button" className={`lang-btn${theme === "dark" ? " active" : ""}`} onClick={() => setTheme("dark")} aria-pressed={theme === "dark"}>🌙 {t("themeDark")}</button>
+    </div>
+  );
+}
 
 function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => localStorage.getItem("tvk_lang") || "en");
@@ -777,7 +841,10 @@ function LoginPage({ onLogin, onClose }) {
           <div className="login-logo">
             <span className="logo-badge">TVK</span>
             <span style={{ fontWeight: 800, fontSize: 18, color: "var(--accent)" }}>#TVKFiles</span>
-            <div style={{ marginLeft: "auto" }}><LanguageToggle /></div>
+            <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
           </div>
           <div className="login-title">{t("loginTitle")}</div>
           <div className="login-sub">{t("loginSub")}</div>
@@ -1964,7 +2031,10 @@ function PublicTrackerView({ toast, embedded }) {
                 <div className="pol-brand-tag">{t("siteTagline")}</div>
       </div>
               </div>
-            <LanguageToggle />
+            <div className="masthead-toggles">
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
           </div>
         </header>
       )}
@@ -2166,7 +2236,10 @@ function AdminShell({ user, onViewSite }) {
         <div className="topbar">
           <span className="topbar-title">{PAGE_TITLES[active] || active}</span>
           <div className="topbar-actions">
-            <LanguageToggle />
+            <div className="topbar-toggles">
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
             <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)" }}>{new Date().toLocaleDateString(lang === "ta" ? "ta-IN" : "en-IN")}</span>
             <button className="btn btn-secondary btn-sm" onClick={onViewSite}>🌐 {t("viewPublicSite")}</button>
           </div>
@@ -2269,8 +2342,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
